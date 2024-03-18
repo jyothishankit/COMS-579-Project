@@ -4,7 +4,7 @@ loader = PyPDFLoader("LLMbasedTesting.pdf")
 pages = loader.load_and_split()
 
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from langchain.vectorstores import Weaviate
+from langchain_community.vectorstores import Weaviate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from transformers import AutoTokenizer, AutoModel
 
@@ -28,31 +28,34 @@ client = weaviate.Client(
     url=WEAVIATE_URL
 )
 
+print("Reached here 0 $$$")
 # Ingest the documents into Weaviate
-vector_db = Weaviate.from_documents(
-    split_docs, embeddings, client=client, by_text=False
-)
 
-
+print("Reached here 1 $$$")
 uuid = client.data_object.create({
     'hello': 'World!'
 }, 'MyClass')
 
+print("Reached here 2 $$$")
+
 obj = client.data_object.get_by_id(uuid, class_name='MyClass')
 
+print("Reached here 3 $$$")
 print(json.dumps(obj, indent=2))
 
+print("Reached here 4 $$$")
 
 
-client.schema.create_class({
-    'class': 'Wine'
-})
+# client.schema.create_class({
+#     'class': 'Wine'
+# })
 
 client.data_object.create({
     'name': 'Chardonnay',
     'review': 'Goes well with fish!',
 }, 'Wine')
 
+print("Reached here 5 $$$")
 response = (
     client.query
     .get('Wine', ['name', 'review'])
@@ -62,6 +65,8 @@ response = (
     .do()
 )
 
-assert response['data']['Get']['Wine'][0]['review'] == 'Goes well with fish!'
+print("Reached here 6 $$$")
+#assert response['data']['Get']['Wine'][0]['review'] == 'Goes well with fish!'
 
+print("Reached here 7 $$$")
 print(response)
