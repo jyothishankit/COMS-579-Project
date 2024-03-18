@@ -24,44 +24,73 @@ WEAVIATE_URL="http://localhost:8080"
 import weaviate
 import json
 
+class_object = {
+    "class": "WineEmbd",
+    "vectorizer": "text2vec-huggingface",
+    "properties": [
+        {
+            "name": "title",
+            "dataType": ["text"]
+        },
+        {
+            "name": "description",
+            "dataType": ["text"]
+        }
+    ],
+    "moduleConfig": {
+        "text2vec-huggingface": {
+            "vectorizeClassName": True
+        }
+    }
+}
+
 client = weaviate.Client(
     url=WEAVIATE_URL
 )
 
+client.schema.create_class(class_object)
+
 print("Reached here 0 $$$")
 # Ingest the documents into Weaviate
 
-print("Reached here 1 $$$")
-uuid = client.data_object.create({
-    'hello': 'World!'
-}, 'MyClass')
+# print("Reached here 1 $$$")
+# uuid = client.data_object.create({
+#     'hello': 'World!'
+# }, 'MyClass')
 
-print("Reached here 2 $$$")
+# print("Reached here 2 $$$")
 
-obj = client.data_object.get_by_id(uuid, class_name='MyClass')
+# obj = client.data_object.get_by_id(uuid, class_name='MyClass')
 
-print("Reached here 3 $$$")
-print(json.dumps(obj, indent=2))
+# print("Reached here 3 $$$")
+# print(json.dumps(obj, indent=2))
 
-print("Reached here 4 $$$")
+# print("Reached here 4 $$$")
 
 
-# client.schema.create_class({
-#     'class': 'Wine'
-# })
+# # client.schema.create_class({
+# #     'class': 'Wine'
+# # })
 
-client.data_object.create({
+uuid=client.data_object.create({
     'name': 'Chardonnay',
     'review': 'Goes well with fish!',
-}, 'Wine')
+    },'WineEmbd')
 
 print("Reached here 5 $$$")
+
+print(uuid+" is the UUID for WineEmbd object class")
+obj = client.data_object.get_by_id(uuid, class_name='WineEmbd')
+
+print("Reached here 5 fetched using uuid $$$")
+
+print(json.dumps(obj, indent=2))
+
+print("Reached here 5 end using uuid fetched Wine class object")
+
 response = (
     client.query
-    .get('Wine', ['name', 'review'])
-    .with_near_text({
-        'concepts': ['great for seafood']
-    })
+    .get('WineEmbd', ['name', 'review'])
     .do()
 )
 
