@@ -1,101 +1,53 @@
+import sys
+import weaviate
+import json
 from langchain_community.document_loaders import PyPDFLoader
-
-loader = PyPDFLoader("LLMbasedTesting.pdf")
-pages = loader.load_and_split()
-
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Weaviate
+from langchain_community.vectorstores.weaviate import Weaviate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from transformers import AutoTokenizer, AutoModel
+if(len(sys.argv)<2):
+    print("No pdf document passed")
+    exit(0)
 
+loader = PyPDFLoader(sys.argv[1])
+pages = loader.load_and_split()
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000, chunk_overlap=200, add_start_index=True
 )
-
 split_docs = text_splitter.split_documents(pages)
 
-embedding_model_name = "sentence-transformers/all-mpnet-base-v2"
-embeddings = HuggingFaceEmbeddings(
-  model_name=embedding_model_name
-)
+print(split_docs[0].page_content)
+embedding_model_name = "google-bert/bert-base-uncased"
 
 WEAVIATE_URL="http://localhost:8080"
-
-import weaviate
-import json
-
-class_object = {
-    "class": "WineEmbd",
-    "vectorizer": "text2vec-huggingface",
-    "properties": [
-        {
-            "name": "title",
-            "dataType": ["text"]
-        },
-        {
-            "name": "description",
-            "dataType": ["text"]
-        }
-    ],
-    "moduleConfig": {
-        "text2vec-huggingface": {
-            "vectorizeClassName": True
-        }
-    }
-}
+# class_object_document = {
+#     "class": "Document",
+#     "vectorizer": "text2vec-huggingface",
+#     "moduleConfig": {
+#         "text2vec-huggingface": {
+#             "vectorizeClassName": True
+#         }
+#     }
+# }
 
 client = weaviate.Client(
     url=WEAVIATE_URL
 )
 
-client.schema.create_class(class_object)
+#client.schema.create_class(class_object_document)
 
-print("Reached here 0 $$$")
-# Ingest the documents into Weaviate
-
-# print("Reached here 1 $$$")
-# uuid = client.data_object.create({
-#     'hello': 'World!'
-# }, 'MyClass')
-
-# print("Reached here 2 $$$")
-
-# obj = client.data_object.get_by_id(uuid, class_name='MyClass')
-
-# print("Reached here 3 $$$")
-# print(json.dumps(obj, indent=2))
-
-# print("Reached here 4 $$$")
-
-
-# # client.schema.create_class({
-# #     'class': 'Wine'
-# # })
-
-uuid=client.data_object.create({
-    'name': 'Chardonnay',
-    'review': 'Goes well with fish!',
-    },'WineEmbd')
-
-print("Reached here 5 $$$")
-
-print(uuid+" is the UUID for WineEmbd object class")
-obj = client.data_object.get_by_id(uuid, class_name='WineEmbd')
-
-print("Reached here 5 fetched using uuid $$$")
-
-print(json.dumps(obj, indent=2))
-
-print("Reached here 5 end using uuid fetched Wine class object")
-
-response = (
-    client.query
-    .get('WineEmbd', ['name', 'review'])
-    .do()
+embeddings = HuggingFaceEmbeddings(
+  model_name=embedding_model_name
 )
+#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
 
-print("Reached here 6 $$$")
-#assert response['data']['Get']['Wine'][0]['review'] == 'Goes well with fish!'
+split_docs=split_docs[:5]
+print(str(len(split_docs))+" is the length of split docs")
+vector_store = Weaviate.from_documents(documents=split_docs, embedding=embeddings, client=client)
 
-print("Reached here 7 $$$")
-print(response)
+print("Reached here after storing documents in vector store")
+retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 6})
+retrieved_docs = retriever.invoke("What is the relation between somatic mutations with age?")
+
+len(retrieved_docs)
+print(retrieved_docs[0].page_content)
