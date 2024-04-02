@@ -1,8 +1,17 @@
 # COMS-579-Project
 RAG
 
+Python version used: 3.9.0
+
 Steps to run:
-1. Open 2 terminals.
-2. Run "docker compose up -d"
-3. Second terminal, first run "pip install -r requirements.txt".
-4. Run "python main.py genemutation.pdf". Python version is 3.11.4
+1. Run Docker Desktop/Docker daemon process.
+2. Open 2 terminals.
+3. Run "docker compose up -d"
+4. Second terminal, first run:
+4(i)   python version of 3.9.0 to be used:
+4(ii)  python --version
+Python 3.9.0
+4(iii) Run "python -m venv ." in the root level of project(containing requirements_local.txt)
+4(iv) Activate virtual env, For Windows use: "Scripts\activate", For MacOS/Linux use "source .venv/bin/activate" 
+4(v) "pip install -r requirements_local.txt".
+5. Run "python main.py genemutation.pdf". (genemutation.pdf is the file name)
