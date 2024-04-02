@@ -15,3 +15,9 @@ Python 3.9.0
 4(iv) Activate virtual env, For Windows use: "Scripts\activate", For MacOS/Linux use "source .venv/bin/activate" 
 4(v) "pip install -r requirements_local.txt".
 5. Run "python main.py genemutation.pdf". (genemutation.pdf is the file name)
+
+
+Video link for RAG demo for indexing, spliting, fetching nearby vector:
+https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/EUq64OGM_hBDp7dMt2a3cKIBYyaCtLqWBXxUOPpYhfvHlw
+
+
