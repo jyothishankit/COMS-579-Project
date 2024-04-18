@@ -12,7 +12,7 @@ Steps to run:
 6.  python --version
 Python 3.9.0
 7. Run "python -m venv ." in the root level of project(containing requirements_local.txt)
-8. Activate virtual env, For Windows use: "Scripts\activate", For MacOS/Linux use "source .venv/bin/activate" 
+8. Activate virtual env, For Windows use: "Scripts\activate", For MacOS/Linux use "source bin/activate" 
 9. "pip install -r requirements_local.txt".
 10. Run "python main.py genemutation.pdf". (genemutation.pdf is the file name)
 
