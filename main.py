@@ -5,6 +5,8 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores.weaviate import Weaviate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import FlashrankRerank
 
 if len(sys.argv) < 2:
   print("Atleast one of --pdf_file or --question must be sent. Usage: python main.py --pdf_file=a.pdf --question=\"What is the capital of USA?\"")
@@ -68,7 +70,7 @@ vector_store = Weaviate.from_documents(documents=split_docs, embedding=embedding
 
 print("Reached here after storing documents in vector store")
 print("\n\n")
-retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 1})
+retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 print("Question is "+question)
 retrieved_docs = retriever.invoke(question)
 print("\n\n")
@@ -78,3 +80,18 @@ print("\n")
 print("\n")
 print("Answer to the question:\n")
 print(retrieved_docs[0].page_content)
+
+print("\n\n")
+print("Using reranking for fetching based on context")
+retriever_contextual_with_reranking = ContextualCompressionRetriever(base_retriever=retriever,base_compressor=FlashrankRerank(),query=question, search_kwargs={"k": 5})
+
+reranked_docs = retriever_contextual_with_reranking.get_relevant_documents(question)
+
+print("\n\n")
+print("Output of reranked documents with relevance scores")
+print(reranked_docs)
+
+print("\n\n")
+print("Top answer of reranked vectors")
+print(reranked_docs[0].page_content)
+
