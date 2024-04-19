@@ -20,4 +20,7 @@ Python 3.9.0
 Video link for RAG demo for indexing, spliting, fetching nearby vector:
 https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/EUq64OGM_hBDp7dMt2a3cKIBYyaCtLqWBXxUOPpYhfvHlw
 
+Video link for passing question and retrieving answer:
+https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/Ecx-X8sHRqpHvACr5i7t9M0BxoP0wwvTVvg0VENKHbD0rg
+
 
