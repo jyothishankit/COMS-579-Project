@@ -5,18 +5,39 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores.weaviate import Weaviate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+if len(sys.argv) < 2:
+  print("Atleast one of --pdf_file or --question must be sent. Usage: python main.py --pdf_file=a.pdf --question=\"What is the capital of USA?\"")
+  exit()
+
+pdf_file = None
+question = None
+for arg in sys.argv[1:]:
+  if arg.startswith("--pdf_file="):
+    pdf_file = arg.split("=")[1]
+  elif arg.startswith("--question="):
+    question = arg.split("=")[1]
+  else:
+    print(f"Invalid argument: {arg}")
+    exit()
+
+if not pdf_file or not question:
+  print("Error: Missing required arguments!")
+  exit()
+
 if(len(sys.argv)<2):
     print("No pdf document passed")
     exit(0)
 
-loader = PyPDFLoader(sys.argv[1])
+loader = PyPDFLoader(pdf_file)
 pages = loader.load_and_split()
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000, chunk_overlap=200, add_start_index=True
 )
 split_docs = text_splitter.split_documents(pages)
 
-print(split_docs[0].page_content)
+#Can print initial file contents
+#print(split_docs[0].page_content)
 embedding_model_name = "google-bert/bert-base-uncased"
 
 WEAVIATE_URL="http://localhost:8080"
@@ -41,13 +62,19 @@ embeddings = HuggingFaceEmbeddings(
 )
 #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
 
-split_docs=split_docs[:5]
+#split_docs=split_docs[:5]
 print(str(len(split_docs))+" is the length of split docs")
 vector_store = Weaviate.from_documents(documents=split_docs, embedding=embeddings, client=client)
 
 print("Reached here after storing documents in vector store")
-retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 6})
-retrieved_docs = retriever.invoke("What is the relation between somatic mutations with age?")
-
-len(retrieved_docs)
+print("\n\n")
+retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 1})
+print("Question is "+question)
+retrieved_docs = retriever.invoke(question)
+print("\n\n")
+print("Full output of retriever")
+print(retrieved_docs)
+print("\n")
+print("\n")
+print("Answer to the question:\n")
 print(retrieved_docs[0].page_content)

@@ -14,8 +14,8 @@ Python 3.9.0
 7. Run "python -m venv ." in the root level of project(containing requirements_local.txt)
 8. Activate virtual env, For Windows use: "Scripts\activate", For MacOS/Linux use "source bin/activate" 
 9. "pip install -r requirements_local.txt".
-10. Run "python main.py genemutation.pdf". (genemutation.pdf is the file name)
-
+10. Run "python main.py --pdf_file=genemutation.pdf --question="What is the relation between hypermutable brains and age?"". (genemutation.pdf is the file name)
+11. !!Caution: Code takes more than 7mins to show output.
 
 Video link for RAG demo for indexing, spliting, fetching nearby vector:
 https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/EUq64OGM_hBDp7dMt2a3cKIBYyaCtLqWBXxUOPpYhfvHlw
