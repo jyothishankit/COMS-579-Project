@@ -15,6 +15,12 @@ Python 3.10.0
 8. Activate virtual env, For Windows use: "Scripts\activate", For MacOS/Linux use "source bin/activate" 
 9. "pip install -r requirements_local.txt".
 10. Run "funix upload.py".
+Use pdf file names:
+pdf file name 1: genemutation.pdf
+pdf file name 2: LLMbasedTesting.pdf
+pdf file name 3: psychiatry.pdf,
+Use question: What is the relation between hypermutable brains and age?
+
 11. !!Caution: Code takes more than 7mins to show output.
 
 Video link for RAG demo for indexing, spliting, fetching nearby vector:
