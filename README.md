@@ -21,7 +21,7 @@ pdf file name 2: LLMbasedTesting.pdf<br>
 pdf file name 3: psychiatry.pdf<br>
 Use question: What is the relation between hypermutable brains and age?<br><br>
 
-11. !!Caution: Code takes more than 7mins to show output.<br>
+11. !!Caution: Code takes more around 5mins to show output.<br>
 
 Assignment 1:
 Video link for RAG demo for indexing, spliting, fetching nearby vector:
