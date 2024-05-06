@@ -33,7 +33,7 @@ https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/Ecx-X8sH
 
 Assignment 3:
 Video link for final project with Funix UI:
-https://iowastate-my.sharepoint.com/:v:/g/personal/ajayt_iastate_edu/EZfXEQsly6xJg5luQMzCvDIBf66PoOLR64BEGNrBg2tfDQ?e=ehNCCu
+https://iowastate-my.sharepoint.com/:v:/g/personal/ajayt_iastate_edu/Ecm6ZZDB9QdHo2rm6IGtYuUBrkuPYTEZl36GJwATGZLu1Q?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=AqpWDY
 
 <img width="1440" alt="Screenshot 2024-05-06 at 6 09 14 PM" src="https://github.com/jyothishankit/COMS-579-Project/assets/50821462/37048703-de71-4ac5-a804-a2f631be4bd1">
 
