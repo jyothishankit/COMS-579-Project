@@ -23,11 +23,17 @@ Use question: What is the relation between hypermutable brains and age?<br><br>
 
 11. !!Caution: Code takes more than 7mins to show output.<br>
 
+Assignment 1:
 Video link for RAG demo for indexing, spliting, fetching nearby vector:
 https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/EUq64OGM_hBDp7dMt2a3cKIBYyaCtLqWBXxUOPpYhfvHlw
 
+Assignment 2:
 Video link for passing question and retrieving answer:
 https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/Ecx-X8sHRqpHvACr5i7t9M0BxoP0wwvTVvg0VENKHbD0rg
+
+Assignment 3:
+Video link for final project with Funix UI:
+https://iowastate-my.sharepoint.com/:v:/g/personal/ajayt_iastate_edu/EZfXEQsly6xJg5luQMzCvDIBf66PoOLR64BEGNrBg2tfDQ?e=ehNCCu
 
 <img width="1440" alt="Screenshot 2024-05-06 at 6 09 14 PM" src="https://github.com/jyothishankit/COMS-579-Project/assets/50821462/37048703-de71-4ac5-a804-a2f631be4bd1">
 
