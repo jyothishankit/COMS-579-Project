@@ -29,4 +29,5 @@ https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/EUq64OGM
 Video link for passing question and retrieving answer:
 https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/Ecx-X8sHRqpHvACr5i7t9M0BxoP0wwvTVvg0VENKHbD0rg
 
+<img width="1440" alt="Screenshot 2024-05-06 at 6 09 14 PM" src="https://github.com/jyothishankit/COMS-579-Project/assets/50821462/37048703-de71-4ac5-a804-a2f631be4bd1">
 
