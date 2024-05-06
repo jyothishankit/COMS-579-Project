@@ -3,3 +3,7 @@ Scripts/
 share/
 Include/
 pyvenv.cfg
+bin/
+include/
+lib/
+share/
