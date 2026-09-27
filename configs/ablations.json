@@ -1,0 +1,61 @@
+[
+  {
+    "name": "A-baseline-rcts500-top8",
+    "chunker": "rcts",
+    "chunk_size": 500,
+    "use_bm25": false,
+    "reranker": "none",
+    "refine": "none",
+    "rerank_topk": 8
+  },
+  {
+    "name": "B-hybrid-bm25",
+    "chunker": "rcts",
+    "chunk_size": 500,
+    "use_bm25": true,
+    "reranker": "none",
+    "refine": "none",
+    "rerank_topk": 8
+  },
+  {
+    "name": "C-hybrid-rerank",
+    "chunker": "rcts",
+    "chunk_size": 500,
+    "use_bm25": true,
+    "reranker": "flashrank",
+    "rerank_input_topk": 100,
+    "refine": "none",
+    "rerank_topk": 8
+  },
+  {
+    "name": "D-hybrid-rerank-refine-embedding",
+    "chunker": "rcts",
+    "chunk_size": 500,
+    "use_bm25": true,
+    "reranker": "flashrank",
+    "rerank_input_topk": 100,
+    "rerank_topk": 12,
+    "refine": "embedding"
+  },
+  {
+    "name": "E-structural-chunking",
+    "chunker": "structural",
+    "chunk_size": 500,
+    "use_bm25": true,
+    "reranker": "flashrank",
+    "rerank_input_topk": 100,
+    "rerank_topk": 12,
+    "refine": "embedding"
+  },
+  {
+    "name": "F-llm-span-refinement",
+    "chunker": "rcts",
+    "chunk_size": 500,
+    "use_bm25": true,
+    "reranker": "flashrank",
+    "rerank_input_topk": 100,
+    "rerank_topk": 16,
+    "refine": "llm",
+    "refine_chunks": 12
+  }
+]

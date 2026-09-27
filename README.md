@@ -1,39 +1,149 @@
-# COMS-579-Project
-RAG
+# COMS-579 — Advanced Legal RAG
 
-Python version used: 3.10.0
+A retrieval-augmented generation system for legal documents, evaluated against
+[LegalBench-RAG](https://arxiv.org/abs/2408.10343).
 
-Steps to run:
-1. Run Docker Desktop/Docker daemon process.
-2. Open 2 terminals.
-3. First terminal: Run "docker compose up -d"<br>
-4. Second terminal, follow the below steps.<br>
-5. python version of 3.10.0 to be used:<br>
-6.  python --version<br>
-Python 3.10.0
-7. Run "python -m venv ." in the root level of project(containing requirements_local.txt)<br>
-8. Activate virtual env, For Windows use: "Scripts\activate", For MacOS/Linux use "source bin/activate" <br>
-9. "pip install -r requirements_local.txt".
-10. Run "funix upload.py".<br>
-Use pdf file names:<br>
-pdf file name 1: genemutation.pdf<br>
-pdf file name 2: LLMbasedTesting.pdf<br>
-pdf file name 3: psychiatry.pdf<br>
-Use question: What is the relation between hypermutable brains and age?<br><br>
+```
+PDF / text  →  chunk  →  OpenAI embeddings  →  Pinecone  →  rerank  →  refine  →  LLM
+```
 
-11. !!Caution: Code takes more around 5mins to show output.<br>
+## Why this beats a conventional RAG pipeline
 
-Assignment 1:
-Video link for RAG demo for indexing, spliting, fetching nearby vector:
-https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/EUq64OGM_hBDp7dMt2a3cKIBYyaCtLqWBXxUOPpYhfvHlw
+LegalBench-RAG grades retrieval at the **character** level: precision is the
+fraction of returned characters that fall inside a ground-truth span, recall the
+fraction of ground-truth characters returned. That changes what "good retrieval"
+means. A conventional pipeline that returns eight 500-character chunks to answer
+a question whose answer is 400 characters long is capped at roughly 10%
+precision even when every chunk is correct.
 
-Assignment 2:
-Video link for passing question and retrieving answer:
-https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/Ecx-X8sHRqpHvACr5i7t9M0BxoP0wwvTVvg0VENKHbD0rg
+This system is built around that fact:
 
-Assignment 3:
-Video link for final project with Funix UI:
-https://iowastate-my.sharepoint.com/:v:/g/personal/ajayt_iastate_edu/Ecm6ZZDB9QdHo2rm6IGtYuUBrkuPYTEZl36GJwATGZLu1Q?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=AqpWDY
+1. **Every chunk carries an exact character span.** All three chunkers tile a
+   document precisely — concatenating the chunks reproduces the file byte for
+   byte. This is enforced by tests, because a drifting offset silently corrupts
+   every score downstream.
+2. **Hybrid recall.** Dense embeddings plus BM25, fused by reciprocal rank.
+   Legal queries hinge on defined terms ("Receiving Party", "Change of Control")
+   that lexical matching catches and embeddings blur.
+3. **Cross-encoder reranking.** A local ONNX model reads query and passage
+   jointly over ~100 candidates. No API cost.
+4. **Sentence-level span refinement.** Retrieved regions are split into
+   sentences and cut down to the ones that actually answer the question. This is
+   where most of the precision gain comes from.
 
-<img width="1440" alt="Screenshot 2024-05-06 at 6 09 14 PM" src="https://github.com/jyothishankit/COMS-579-Project/assets/50821462/37048703-de71-4ac5-a804-a2f631be4bd1">
+## Results
 
+Scored with the official LegalBench-RAG metrics and sampling procedure
+(194 queries per corpus, 776 total). See `RESULTS.md` for the full table and the
+ablation ladder.
+
+## Setup
+
+```bash
+python3.10 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev,ui]"
+
+cp .env.example .env     # then add your OpenAI key
+docker compose up -d pinecone
+```
+
+Download the LegalBench-RAG corpus from the
+[dataset link](https://github.com/zeroentropy-ai/legalbenchrag) and point
+`LEGALBENCH_DIR` at the folder containing `corpus/` and `benchmarks/`.
+
+### Secrets
+
+`.env` is gitignored and is the only place a key should live. Never paste a key
+into a file that git tracks, into a commit message, or into a chat window — if
+you do, rotate it.
+
+## Usage
+
+```bash
+# Ask a question over your own documents
+legalrag ask "What is the relation between hypermutable brains and age?" \
+    -f genemutation.pdf -f LLMbasedTesting.pdf -f psychiatry.pdf --show-spans
+
+# Reproduce the published baseline
+legalrag eval --baseline
+
+# Run the advanced pipeline
+legalrag eval --strategy configs/advanced.json
+
+# Ablation ladder on a fast subset
+legalrag sweep configs/ablations.json --max-tests 25
+```
+
+The original Funix UI still works:
+
+```bash
+funix upload.py
+```
+
+## Architecture
+
+| Module | Responsibility |
+|---|---|
+| `config.py` | Settings from `.env`; `RetrievalStrategy` describes one full configuration |
+| `ingest.py` | PDF and text loading, with cached extraction |
+| `chunking.py` | `naive`, `rcts` and legal-`structural` splitters, all offset-exact |
+| `embeddings.py` | OpenAI embeddings: batching, rate limiting, SQLite vector cache |
+| `stores.py` | Pinecone and numpy vector stores, BM25 index, RRF fusion |
+| `rerank.py` | Local cross-encoder and LLM listwise rerankers |
+| `refine.py` | Region building and sentence-level span selection |
+| `generation.py` | Grounded answer synthesis with citations |
+| `evaluation.py` | LegalBench-RAG metrics, sampling and reporting |
+| `engine.py` | Wires the stages together |
+| `cli.py` | `ask`, `eval`, `sweep` |
+
+Every stage is switchable through `RetrievalStrategy`, so each number in the
+ablation table is attributable to one component rather than to the pipeline as a
+whole.
+
+### Pinecone via Docker
+
+`docker compose up -d pinecone` starts
+[Pinecone Local](https://docs.pinecone.io/guides/operations/local-development),
+an in-memory emulator of the Pinecone API that needs no account. Indexes are
+created per run and deleted on exit; nothing persists across container restarts.
+
+Two implementation notes, both discovered against the running emulator:
+
+- Its control plane predates the current SDK's create-index payload, so index
+  creation goes over REST while the data plane uses the SDK.
+- Upsert bodies are capped at 2 MB, so batch size is computed from the vector
+  dimension rather than fixed.
+
+To use Pinecone cloud instead, set a real `PINECONE_API_KEY` and leave
+`PINECONE_LOCAL_HOST` empty. Set `VECTOR_BACKEND=numpy` for an exact
+brute-force search with no service at all.
+
+## Rate limits
+
+Free-tier OpenAI accounts cap embeddings at 40k tokens/minute and some chat
+models at ~50 requests **per day**, which makes LLM-based span refinement
+impractical across all 776 queries. `scripts/check_limits.py` prints the current
+ceilings; set `embed_tpm`, `embed_rpm`, `llm_tpm` and `llm_rpm` in `.env` to
+match. Embeddings and LLM responses are cached on disk, so a repeated run is
+free and byte-identical.
+
+## Tests
+
+```bash
+pytest
+```
+
+The suite covers the invariants that character-level scoring depends on: exact
+tiling, span/text agreement, sentence-splitter contiguity, whitespace trimming,
+disjointness of returned snippets, and the metric definitions themselves.
+
+## Prior coursework
+
+Earlier assignment demos (Weaviate + HuggingFace embeddings):
+
+- [Indexing, splitting, nearest-vector retrieval](https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/EUq64OGM_hBDp7dMt2a3cKIBYyaCtLqWBXxUOPpYhfvHlw)
+- [Question answering](https://iowastate-my.sharepoint.com/:v:/g/personal/ankitj99_iastate_edu/Ecx-X8sHRqpHvACr5i7t9M0BxoP0wwvTVvg0VENKHbD0rg)
+- [Funix UI](https://iowastate-my.sharepoint.com/:v:/g/personal/ajayt_iastate_edu/Ecm6ZZDB9QdHo2rm6IGtYuUBrkuPYTEZl36GJwATGZLu1Q)
+
+`docker compose --profile legacy up -d` still starts the Weaviate service those
+demos used.

@@ -1,28 +1,39 @@
----
-version: '3.4'
 services:
-  weaviate:
-    command:
-    - --host
-    - 0.0.0.0
-    - --port
-    - '8080'
-    - --scheme
-    - http
-    image: cr.weaviate.io/semitechnologies/weaviate:1.24.4
+  # Pinecone Local: an in-memory emulator of the Pinecone API. It needs no
+  # account and no network egress, so the whole pipeline runs offline after
+  # embeddings are cached. Data is NOT persisted across restarts.
+  pinecone:
+    image: ghcr.io/pinecone-io/pinecone-local:latest
+    platform: linux/amd64
+    environment:
+      PORT: 5080
+      PINECONE_HOST: localhost
     ports:
-    - 8080:8080
-    - 50051:50051
+      - "5080-5090:5080-5090"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -q -O- http://localhost:5080/indexes || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # The original assignment pipeline. Kept so the earlier demos still run:
+  #   docker compose --profile legacy up -d
+  weaviate:
+    profiles: ["legacy"]
+    image: cr.weaviate.io/semitechnologies/weaviate:1.24.4
+    command: ["--host", "0.0.0.0", "--port", "8080", "--scheme", "http"]
+    ports:
+      - "8080:8080"
+      - "50051:50051"
     volumes:
-    - weaviate_data:/var/lib/weaviate
+      - weaviate_data:/var/lib/weaviate
     restart: on-failure:0
     environment:
       QUERY_DEFAULTS_LIMIT: 25
-      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
-      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
-      DEFAULT_VECTORIZER_MODULE: 'none'
-      ENABLE_MODULES: 'text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai'
-      CLUSTER_HOSTNAME: 'node1'
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      DEFAULT_VECTORIZER_MODULE: "none"
+      CLUSTER_HOSTNAME: "node1"
+
 volumes:
   weaviate_data:
-...

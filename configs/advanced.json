@@ -1,0 +1,16 @@
+{
+  "name": "advanced",
+  "chunker": "rcts",
+  "chunk_size": 500,
+  "dense_topk": 150,
+  "use_bm25": true,
+  "bm25_topk": 150,
+  "bm25_weight": 0.4,
+  "expansion": "none",
+  "reranker": "flashrank",
+  "rerank_input_topk": 100,
+  "rerank_topk": 12,
+  "refine": "embedding",
+  "refine_chunks": 12,
+  "refine_context_chars": 0
+}
